@@ -76,7 +76,8 @@
                             (get-in [:command :sequential-params]))]
         (if seq-params?
           (dispatch [:set-chat-seq-arg-input-text arg])
-          (let [command-name (first command)
+          (let [arg          (str/replace arg (re-pattern const/arg-wrapping-char) "")
+                command-name (first command)
                 command-args (into [] (rest command))
                 command-args (if (< index (count command-args))
                                (assoc command-args index arg)

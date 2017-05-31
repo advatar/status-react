@@ -52,7 +52,7 @@
                    (let [quotes-count       (count (filter #(= % const/arg-wrapping-char) arg))
                          has-quote?         (and (= quotes-count 1)
                                                  (str/index-of arg const/arg-wrapping-char))
-                         arg                (str/replace arg #"\"" "")
+                         arg                (str/replace arg (re-pattern const/arg-wrapping-char) "")
                          new-list           (if command-started?
                                               (let [index (dec (count list))]
                                                 (update list index str const/spacing-char arg))
@@ -99,16 +99,20 @@
 (def *no-argument-error* -1)
 
 (defn current-chat-argument-position
-  [{:keys [args sequential-params] :as command} input-text selection seq-arguments]
+  [{:keys [args] :as command} input-text selection seq-arguments]
   (if command
-    (if sequential-params
+    (if (get-in command [:command :sequential-params])
       (count seq-arguments)
       (let [subs-input-text (subs input-text 0 selection)]
         (if subs-input-text
-          (let [args             (split-command-args subs-input-text)
-                argument-index   (dec (count args))
-                ends-with-space? (text-ends-with-space? subs-input-text)]
-            (if ends-with-space?
+          (let [args               (split-command-args subs-input-text)
+                argument-index     (dec (count args))
+                ends-with-space?   (text-ends-with-space? subs-input-text)
+                arg-wrapping-count (-> (frequencies subs-input-text)
+                                       (get const/arg-wrapping-char)
+                                       (or 0))]
+            (if (and ends-with-space?
+                     (even? arg-wrapping-count))
               argument-index
               (dec argument-index)))
           *no-argument-error*)))

@@ -293,7 +293,7 @@ function validateSend(params, context) {
         };
     }
 
-    if (Number.isNaN(params.amount.replace(",", "."))) {
+    if (isNaN(parseFloat(params.amount.replace(",", ".")))) {
         return {
             markup: status.components.validationMessage(
                 I18n.t('validation_title'),
@@ -524,7 +524,7 @@ status.command({
             };
         }
 
-        if (Number.isNaN(params.amount.replace(",", "."))) {
+        if (isNaN(parseFloat(params.amount.replace(",", ".")))) {
             return {
                 markup: status.components.validationMessage(
                     I18n.t('validation_title'),

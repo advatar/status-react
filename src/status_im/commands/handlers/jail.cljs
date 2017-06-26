@@ -38,16 +38,14 @@
 
 (defn suggestions-handler!
   [{:keys [contacts chats] :as db} [{:keys [chat-id default-db command parameter-index result]}]]
-  (let [returned         (get-in result [:result :returned])
+  (let [{:keys [markup] :as returned} (get-in result [:result :returned])
         contains-markup? (contains? returned :markup)
-        markup           (get returned :markup)
-        {:keys [dapp? dapp-url]} (get contacts chat-id)
-        path             (if command
-                           [:chats chat-id :parameter-boxes (:name command) parameter-index]
-                           [:chats chat-id :parameter-boxes :message])]
+        path (if command
+               [:chats chat-id :parameter-boxes (:name command) parameter-index]
+               [:chats chat-id :parameter-boxes :message])]
     (dispatch [:choose-predefined-expandable-height :parameter-box :default])
     (when (and contains-markup? (not= (get-in db path) markup))
-      (dispatch [:set-in path (when markup {:hiccup markup})])
+      (dispatch [:set-in path returned])
       (when default-db
         (dispatch [:update-bot-db {:bot chat-id
                                    :db  default-db}])))))

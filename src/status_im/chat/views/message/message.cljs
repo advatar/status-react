@@ -93,15 +93,13 @@
 (defn wallet-command-preview
   [{{:keys [name]} :contact-chat
     :keys          [contact-address params outgoing? current-chat-id]}]
-  (let [amount (if (= 1 (count params))
-                 (first (vals params))
-                 (str params))]
+  (let [{:keys [recipient amount]} params]
     [text {:style st/command-text
            :font  :default}
      (if (= current-chat-id wallet-chat-id)
        (let [label-val (if outgoing? :t/chat-send-eth-to :t/chat-send-eth-from)]
          (label label-val {:amount    amount
-                           :chat-name (or name contact-address)}))
+                           :chat-name (or name contact-address recipient)}))
        (label :t/chat-send-eth {:amount amount}))]))
 
 (defn wallet-command? [content-type]

@@ -41,11 +41,13 @@
   :select-chat-input-command
   (handlers/side-effect!
     (fn [{:keys [current-chat-id chat-ui-props] :as db}
-         [_ {:keys [prefill sequential-params] :as command} metadata prevent-auto-focus?]]
+         [_ {:keys [prefill prefill-bot-db sequential-params] :as command} metadata prevent-auto-focus?]]
       (dispatch [:set-chat-input-text (str (chat-utils/command-name command)
                                            const/spacing-char
                                            (when-not sequential-params
                                              (input-model/join-command-args prefill)))])
+      (when prefill-bot-db
+        (dispatch [:update-bot-db current-chat-id prefill-bot-db]))
       (dispatch [:set-chat-input-metadata metadata])
       (dispatch [:set-chat-ui-props {:show-suggestions?   false
                                      :result-box          nil

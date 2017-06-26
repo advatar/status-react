@@ -460,17 +460,20 @@ status.command({
     title: I18n.t('request_title'),
     description: I18n.t('request_description'),
     params: paramsRequest,
-    handler: function (params) {
+    handler: function (params, context) {
         var val = params["amount"].replace(",", ".");
 
         return {
             event: "request",
-            params: [params["bot-db"]["contact"]["address"], val],
             request: {
                 command: "send",
                 params: {
-                    recipient: params["bot-db"]["contact"]["address"],
+                    recipient: context["current-account"]["name"],
                     amount: val
+                },
+                prefill: [context["current-account"]["name"], val],
+                prefillBotDb: {
+                    contact: context["current-account"]
                 }
             }
         };

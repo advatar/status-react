@@ -47,7 +47,8 @@
                                            (when-not sequential-params
                                              (input-model/join-command-args prefill)))])
       (when prefill-bot-db
-        (dispatch [:update-bot-db current-chat-id prefill-bot-db]))
+        (dispatch [:update-bot-db {:bot current-chat-id
+                                   :db  prefill-bot-db}]))
       (dispatch [:set-chat-input-metadata metadata])
       (dispatch [:set-chat-ui-props {:show-suggestions?   false
                                      :result-box          nil

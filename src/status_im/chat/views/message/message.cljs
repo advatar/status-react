@@ -1,6 +1,7 @@
 (ns status-im.chat.views.message.message
   (:require-macros [status-im.utils.views :refer [defview]])
   (:require [re-frame.core :refer [subscribe dispatch]]
+            [clojure.walk :as walk]
             [reagent.core :as r]
             [status-im.i18n :refer [message-status-label]]
             [status-im.components.react :refer [view
@@ -93,7 +94,7 @@
 (defn wallet-command-preview
   [{{:keys [name]} :contact-chat
     :keys          [contact-address params outgoing? current-chat-id]}]
-  (let [{:keys [recipient amount]} params]
+  (let [{:keys [recipient amount]} (walk/keywordize-keys params)]
     [text {:style st/command-text
            :font  :default}
      (if (= current-chat-id wallet-chat-id)
@@ -120,18 +121,19 @@
        (first (vals params))
        (str params))]))
 
+(defn commands-subscription [{:keys [type]}]
+  (if (= type "response")
+    :get-responses
+    :get-commands))
+
 (defview message-content-command
   [{:keys [message-id content content-type chat-id to from outgoing] :as message}]
-  [commands [(if (= (:type content) "response")
-               :get-responses
-               :get-commands)
-             chat-id]
+  [commands [:get-commands-and-responses chat-id]
    global-commands [:get :global-commands]
    current-chat-id [:get-current-chat-id]
    contact-chat [:get-in [:chats (if outgoing to from)]]
    preview [:get-in [:message-data :preview message-id :markup]]]
-  (let [{:keys [command params]}
-        (parse-command-message-content commands global-commands content)
+  (let [{:keys [command params]} (parse-command-message-content commands global-commands content)
         {:keys     [name type]
          icon-path :icon} command]
     [view st/content-command-view

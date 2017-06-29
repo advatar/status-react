@@ -71,6 +71,18 @@
       (reaction (or (get-in @db [:contacts current-chat :responses]) {})))))
 
 (register-sub
+  :get-commands-and-responses
+  (fn [db [_ chat-id]]
+    (reaction
+      (let [{:keys [chats contacts]} @db]
+        (->> (get-in chats [chat-id :contacts])
+             (filter :is-in-chat)
+             (mapv (fn [{:keys [identity]}]
+                     (let [{:keys [commands responses]} (get contacts identity)]
+                       (merge responses commands))))
+             (apply merge))))))
+
+(register-sub
   :possible-chat-actions
   (fn [db [_ chat-id]]
     "Returns a vector of [command message-id] values. `message-id` can be `:any`.

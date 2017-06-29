@@ -70,8 +70,8 @@
                [icon command-icon st/command-request-image])]]))})))
 
 (defn message-content-command-request
-  [{:keys [message-id _ _ _]}]
-  (let [commands-atom       (subscribe [:get-responses])
+  [{:keys [message-id chat-id]}]
+  (let [commands-atom       (subscribe [:get-commands-and-responses chat-id])
         answered?           (subscribe [:is-request-answered? message-id])
         status-initialized? (subscribe [:get :status-module-initialized?])
         markup              (subscribe [:get-in [:message-data :preview message-id :markup]])]
@@ -79,6 +79,7 @@
       (let [commands @commands-atom
             {:keys [prefill prefillBotDb params]} content
             {:keys [command content]} (parse-command-request commands content)
+            _ (log/debug "ALWX content")
             command  (if (and params command)
                        (merge command {:prefill        prefill
                                        :prefill-bot-db prefillBotDb})

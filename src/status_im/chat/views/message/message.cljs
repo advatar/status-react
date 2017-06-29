@@ -129,11 +129,13 @@
 (defview message-content-command
   [{:keys [message-id content content-type chat-id to from outgoing] :as message}]
   [commands [:get-commands-and-responses chat-id]
+   from-commands [:get-commands-and-responses from]
    global-commands [:get :global-commands]
    current-chat-id [:get-current-chat-id]
    contact-chat [:get-in [:chats (if outgoing to from)]]
    preview [:get-in [:message-data :preview message-id :markup]]]
-  (let [{:keys [command params]} (parse-command-message-content commands global-commands content)
+  (let [commands (merge commands from-commands)
+        {:keys [command params]} (parse-command-message-content commands global-commands content)
         {:keys     [name type]
          icon-path :icon} command]
     [view st/content-command-view

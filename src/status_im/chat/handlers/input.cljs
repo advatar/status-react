@@ -112,13 +112,16 @@
                                          (= type :grant-permissions))))
           commands        (suggestions/get-command-suggestions db chat-text)
           global-commands (suggestions/get-global-command-suggestions db chat-text)
+          all-commands (->> (into global-commands commands)
+                            (remove (fn [[k {:keys [hidden?]}]] hidden?))
+                            (into {}))
           {:keys [dapp?]} (get-in db [:contacts chat-id])]
       (if (and dapp? (str/blank? chat-text))
         (dispatch [:set-in [:chats chat-id :parameter-boxes :message] nil])
         (dispatch [::check-dapp-suggestions chat-id chat-text]))
       (-> db
           (assoc-in [:chats chat-id :request-suggestions] requests)
-          (assoc-in [:chats chat-id :command-suggestions] (into global-commands commands))))))
+          (assoc-in [:chats chat-id :command-suggestions] all-commands)))))
 
 (handlers/register-handler
   :load-chat-parameter-box

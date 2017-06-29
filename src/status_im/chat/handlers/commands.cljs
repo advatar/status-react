@@ -6,14 +6,18 @@
             [status-im.commands.utils :as cu]
             [status-im.i18n :as i18n]
             [status-im.utils.platform :as platform]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [clojure.string :as str]))
 
 (handlers/register-handler :request-command-data
   (handlers/side-effect!
-    (fn [{:keys [contacts current-account-id] :as db}
+    (fn [{:keys [contacts current-account-id chats] :as db}
          [_ {{:keys [command params content-command type]} :content
-             :keys [message-id chat-id on-requested jail-id] :as message} data-type]]
-      (let [jail-id (or jail-id chat-id)]
+             :keys [message-id from chat-id on-requested jail-id] :as message} data-type]]
+      (let [jail-id (or jail-id chat-id)
+            jail-id (if (get-in chats [jail-id :group-chat])
+                      (get-in chats [jail-id :command-suggestions (keyword command) :owner-id])
+                      jail-id)]
         (if-not (get-in contacts [jail-id :commands-loaded?])
           (do (dispatch [:add-commands-loading-callback
                          jail-id
@@ -26,7 +30,8 @@
                 params   {:parameters params
                           :context    (merge {:platform platform/platform
                                               :from     current-account-id
-                                              :to       to}
+                                              :to       to
+                                              :chat-id  chat-id}
                                              i18n/delimeters)}
                 callback #(let [result (get-in % [:result :returned])
                                 result (if (:markup result)

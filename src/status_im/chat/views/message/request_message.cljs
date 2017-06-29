@@ -79,7 +79,6 @@
       (let [commands @commands-atom
             {:keys [prefill prefillBotDb params]} content
             {:keys [command content]} (parse-command-request commands content)
-            _ (log/debug "ALWX content")
             command  (if (and params command)
                        (merge command {:prefill        prefill
                                        :prefill-bot-db prefillBotDb})

@@ -111,13 +111,13 @@
                       (not= name "global")
                       registered-only)))
        ;; TODO: this part should be removed because it's much better to provide the ability to do this in the API
-       (remove (fn [[_ {:keys [name]}]]
-                 (and (some #{name} ["send" "request"])
-                      (= chat-id wallet-chat-id))))
-       (remove (fn [[n]]
+       (map (fn [[k {:keys [name] :as v}]]
+              [k (assoc v :hidden? (and (some #{name} ["send" "request"])
+                                        (= chat-id wallet-chat-id)))]))
+       (remove (fn [[k _]]
                  (and (= (count contacts) 1)
                       (not= console-chat-id (get (first contacts) :identity))
-                      (h/matches (name n) "password"))))
+                      (h/matches (name k) "password"))))
        (into {})))
 
 (defn get-mailmans-commands [db]

@@ -10,25 +10,27 @@
             [status-im.components.renderers.renderers :as renderers]
             [status-im.utils.listview :as lw]))
 
-(defn- select-contact [arg-index {:keys [name] :as contact}]
-  (dispatch [:set-command-argument [arg-index name true]])
-  (dispatch [:set-in-bot-db {:path  [:contact]
-                             :value contact}])
-  (dispatch [:select-next-argument]))
+(defn- select-contact [arg-index bot-db-key {:keys [name] :as contact}]
+  (let [contact (select-keys contact [:address :public-key :name :photo-path :dapp?])]
+    (dispatch [:set-command-argument [arg-index name true]])
+    (dispatch [:set-in-bot-db {:path  [:public (keyword bot-db-key)]
+                               :value contact}])
+    (dispatch [:select-next-argument])))
 
-(defn render-row [arg-index]
+(defn render-row [arg-index bot-db-key]
   (fn [contact _ _]
     (list-item
       ^{:key contact}
       [contact-view {:contact  contact
-                     :on-press #(select-contact arg-index contact)}])))
+                     :on-press #(select-contact arg-index bot-db-key contact)}])))
 
 (defn choose-contact-view [{arg-index :index}]
   (let [contacts (subscribe [:contacts-filtered :people-in-current-chat])]
     (r/create-class
       {:reagent-render
-       (fn [{title     :title
-             arg-index :index}]
+       (fn [{title      :title
+             arg-index  :index
+             bot-db-key :bot-db-key}]
          [view {:flex 1}
           [text {:style {:font-size      14
                          :color          "rgb(147, 155, 161)"
@@ -39,7 +41,7 @@
            title]
           [list-view {:dataSource                (lw/to-datasource @contacts)
                       :enableEmptySections       true
-                      :renderRow                 (render-row arg-index)
+                      :renderRow                 (render-row arg-index bot-db-key)
                       :bounces                   false
                       :keyboardShouldPersistTaps :always
                       :renderSeparator           renderers/list-separator-renderer}]])})))

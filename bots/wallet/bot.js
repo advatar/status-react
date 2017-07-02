@@ -41,8 +41,8 @@ function amountParameterBox(params, context) {
     }
 
     var contactAddress;
-    if (params["bot-db"]["contact"]) {
-        contactAddress = params["bot-db"]["contact"]["address"];
+    if (params["bot-db"]["public"] && params["bot-db"]["public"]["recipient"]) {
+        contactAddress = params["bot-db"]["public"]["recipient"]["address"];
     } else {
         contactAddress = null;
     }
@@ -249,7 +249,7 @@ var paramsSend = [
         suggestions: function (params) {
             return {
                 title: I18n.t('send_title'),
-                markup: status.components.chooseContact(I18n.t('send_choose_recipient'), 0)
+                markup: status.components.chooseContact(I18n.t('send_choose_recipient'), "recipient", 0)
             };
         }
     },
@@ -265,7 +265,7 @@ function validateSend(params, context) {
         params["bot-db"] = {};
     }
 
-    if (!params["bot-db"]["contact"] || !params["bot-db"]["contact"]["address"]) {
+    if (!params["bot-db"]["public"] || !params["bot-db"]["public"]["recipient"] || !params["bot-db"]["public"]["recipient"]["address"]) {
         return {
             markup: status.components.validationMessage(
                 "Wrong address",
@@ -320,7 +320,7 @@ function validateSend(params, context) {
     var fee = calculateFee(
         params["bot-db"]["sliderValue"],
         {
-            to: params["bot-db"]["contact"]["address"],
+            to: params["bot-db"]["public"]["recipient"]["address"],
             value: val
         }
     );
@@ -342,7 +342,7 @@ function handleSend(params, context) {
 
     var data = {
         from: context.from,
-        to: params["bot-db"]["contact"]["address"],
+        to: params["bot-db"]["public"]["recipient"]["address"],
         value: val,
         gasPrice: calculateGasPrice(params["bot-db"]["sliderValue"])
     };
@@ -395,17 +395,43 @@ function previewSend(params, context) {
         )]
     );
 
+    var firstRow = status.components.view(
+        {
+            style: {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 8,
+                marginBottom: 8
+            }
+        },
+        [amount, currency]
+    );
+
+    var markup;
+    if (params["bot-db"] && params["bot-db"]["recipient"]) {
+        var secondRow = status.components.text(
+            {
+                style: {
+                    color: "#9199a0",
+                    fontSize: 14,
+                    lineHeight: 18
+                }
+            },
+            "to " + params["bot-db"]["recipient"]["name"]
+        );
+        markup = [firstRow, secondRow];
+    } else {
+        markup = [firstRow];
+    }
+
     return {
         markup: status.components.view(
             {
                 style: {
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginTop: 8,
-                    marginBottom: 8
+                    flexDirection: "column"
                 }
             },
-            [amount, currency]
+            markup
         )
     };
 }
@@ -444,7 +470,7 @@ var paramsRequest = [
         suggestions: function (params) {
             return {
                 title: I18n.t('request_title'),
-                markup: status.components.chooseContact(I18n.t('send_choose_recipient'), 0)
+                markup: status.components.chooseContact(I18n.t('send_choose_recipient'), "recipient", 0)
             };
         }
     },
@@ -499,7 +525,11 @@ status.command({
         };
     },
     validator: function (params) {
-        if (!params["bot-db"]["contact"]["address"]) {
+        if (!params["bot-db"]) {
+            params["bot-db"] = {};
+        }
+
+        if (!params["bot-db"]["public"] || !params["bot-db"]["public"]["recipient"] || !params["bot-db"]["public"]["recipient"]["address"]) {
             return {
                 markup: status.components.validationMessage(
                     "Wrong address",

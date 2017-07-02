@@ -178,9 +178,10 @@ function validationMessage(titleText, descriptionText) {
     }];
 }
 
-function chooseContact(titleText, argumentIndex) {
+function chooseContact(titleText, botDbKey, argumentIndex) {
     return ['choose-contact', {
         title: titleText,
+        "bot-db-key": botDbKey,
         index: argumentIndex
     }];
 }

@@ -9,6 +9,13 @@
             [taoensso.timbre :as log]
             [clojure.string :as str]))
 
+(defn generate-context [{:keys [contacts current-account-id chats] :as db} chat-id to]
+  (merge {:platform platform/platform
+          :from     current-account-id
+          :to       to
+          :chat     {:chat-id chat-id}}
+         i18n/delimeters))
+
 (handlers/register-handler :request-command-data
   (handlers/side-effect!
     (fn [{:keys [contacts current-account-id chats] :as db}
@@ -28,11 +35,7 @@
                           data-type]
                 to       (get-in contacts [chat-id :address])
                 params   {:parameters params
-                          :context    (merge {:platform platform/platform
-                                              :from     current-account-id
-                                              :to       to
-                                              :chat-id  chat-id}
-                                             i18n/delimeters)}
+                          :context    (generate-context db chat-id to)}
                 callback #(let [result (get-in % [:result :returned])
                                 result (if (:markup result)
                                          (update result :markup cu/generate-hiccup)

@@ -112,7 +112,10 @@ function amountParameterBox(params, context) {
                                 status.components.text(
                                     {
                                         font: "light",
+                                        numberOfLines: 1,
+                                        ellipsizeMode: "tail",
                                         style: {
+                                            maxWidth: 250,
                                             fontSize: 38,
                                             marginLeft: 8,
                                             color: "black"

@@ -285,7 +285,7 @@ function validateSend(params, context) {
         };
     }
 
-    var amount = params.amount.replace(",", ".");
+    var amount = params["amount"].replace(",", ".");
     var amountSplitted = amount.split(".");
     if (amountSplitted.length === 2 && amountSplitted[1].length > 18) {
         return {
@@ -561,6 +561,20 @@ status.command({
         }
 
         if (isNaN(parseFloat(params.amount.replace(",", ".")))) {
+            return {
+                markup: status.components.validationMessage(
+                    I18n.t('validation_title'),
+                    I18n.t('validation_invalid_number')
+                )
+            };
+        }
+
+        try {
+            var val = web3.toWei(amount, "ether");
+            if (val <= 0) {
+                throw new Error();
+            }
+        } catch (err) {
             return {
                 markup: status.components.validationMessage(
                     I18n.t('validation_title'),

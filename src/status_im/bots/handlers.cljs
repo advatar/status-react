@@ -71,5 +71,12 @@
 
 (u/register-handler
   :update-bot-db
-  (fn [app-db [_ {:keys [bot db]}]]
-    (update-in app-db [:bot-db bot] merge db)))
+  (fn [{:keys [current-chat-id] :as app-db} [_ {:keys [bot db]}]]
+    (let [bot (or bot current-chat-id)]
+      (update-in app-db [:bot-db bot] merge db))))
+
+(u/register-handler
+  :clear-bot-db
+  (fn [{:keys [current-chat-id] :as app-db} [_ {:keys [bot]}]]
+    (let [bot (or bot current-chat-id)]
+      (assoc-in app-db [:bot-db bot] nil))))

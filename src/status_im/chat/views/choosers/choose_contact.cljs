@@ -2,6 +2,8 @@
   (:require-macros [status-im.utils.views :refer [defview]])
   (:require [reagent.core :as r]
             [re-frame.core :refer [dispatch subscribe]]
+            [clojure.string :as str]
+            [status-im.chat.constants :as const]
             [status-im.components.react :refer [view
                                                 text
                                                 list-view
@@ -11,7 +13,8 @@
             [status-im.utils.listview :as lw]))
 
 (defn- select-contact [arg-index bot-db-key {:keys [name] :as contact}]
-  (let [contact (select-keys contact [:address :public-key :name :photo-path :dapp?])]
+  (let [contact (select-keys contact [:address :public-key :name :photo-path :dapp?])
+        name    (str/replace name (re-pattern const/arg-wrapping-char) "")]
     (dispatch [:set-command-argument [arg-index name true]])
     (dispatch [:set-in-bot-db {:path  [:public (keyword bot-db-key)]
                                :value contact}])

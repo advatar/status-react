@@ -59,6 +59,8 @@
          ^{:key (str "command-" index)}
          [command-view (= index 0) command])])]])
 
+(def prev-command (atom nil))
+
 (defn- basic-text-input [_]
   (let [input-text           (subscribe [:chat :input-text])
         command              (subscribe [:selected-chat-command])
@@ -94,12 +96,15 @@
                                       (dispatch [:set-chat-input-text text])
                                       (if @command
                                         (do
+                                          (when (not= @prev-command (-> @command :command :name))
+                                            (dispatch [:clear-bot-db @command]))
                                           (dispatch [:load-chat-parameter-box (:command @command)])
                                           (dispatch [:set-chat-ui-props {:validation-messages nil}]))
                                         (do
                                           (dispatch [:set-chat-input-metadata nil])
                                           (dispatch [:set-chat-ui-props {:result-box          nil
-                                                                         :validation-messages nil}]))))))
+                                                                         :validation-messages nil}])))
+                                      (reset! prev-command (-> @command :command :name)))))
         :on-content-size-change (when (and (not @input-focused?)
                                            (not single-line-input?))
                                   #(let [h (-> (.-nativeEvent %)

@@ -46,6 +46,7 @@
                                            const/spacing-char
                                            (when-not sequential-params
                                              (input-model/join-command-args prefill)))])
+      (dispatch [:clear-bot-db])
       (when prefill-bot-db
         (dispatch [:update-bot-db {:bot current-chat-id
                                    :db  prefill-bot-db}]))

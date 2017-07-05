@@ -10,15 +10,9 @@ I18n.translations = {
         send_explaination: 'This is the most amount of money that might be used to process this transaction. Your transaction will be mined ',
         send_explaination_0: 'in a few minutes or more.',
         send_explaination_1: 'likely within a few minutes.',
-        send_explaination_2: 'likely within a few minutes.',
-        send_explaination_3: 'usually within a minute.',
-        send_explaination_4: 'usually within a minute.',
-        send_explaination_5: 'probably within 30 seconds.',
-        send_explaination_6: 'probably within 30 seconds.',
-        send_explaination_7: 'probably within a few seconds.',
-        send_explaination_8: 'probably within a few seconds.',
-        send_explaination_9: 'probably within a few seconds.',
-        send_explaination_10: 'probably within a few seconds.',
+        send_explaination_2: 'usually within a minute.',
+        send_explaination_3: 'probably within 30 seconds.',
+        send_explaination_4: 'probably within a few seconds.',
 
         eth: 'ETH',
 

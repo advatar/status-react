@@ -8,11 +8,13 @@ function calculateFee(n, tx) {
         estimatedGas = web3.eth.estimateGas(tx);
     }
 
-    return web3.fromWei(web3.eth.gasPrice * Math.pow(2, n - 5) * estimatedGas, "ether");
+    var gasMultiplicator = Math.pow(1.4, n).toFixed(3);
+    return web3.fromWei(web3.eth.gasPrice * gasMultiplicator * estimatedGas, "ether");
 }
 
 function calculateGasPrice(n) {
-    return web3.eth.gasPrice * Math.pow(2, n - 5);
+    var gasMultiplicator = Math.pow(1.4, n).toFixed(3);
+    return web3.eth.gasPrice * gasMultiplicator;
 }
 
 status.defineSubscription(
@@ -24,7 +26,7 @@ status.defineSubscription(
 );
 
 function getFeeExplaination(n) {
-    return I18n.t('send_explaination') + I18n.t('send_explaination_' + n);
+    return I18n.t('send_explaination') + I18n.t('send_explaination_' + (n + 2));
 }
 
 status.defineSubscription(
@@ -63,7 +65,7 @@ function amountParameterBox(params, context) {
         };
     }
 
-    var sliderValue = params["bot-db"]["sliderValue"] || 5;
+    var sliderValue = params["bot-db"]["sliderValue"] || 0;
 
     status.setDefaultDb({
         transaction: txData,
@@ -180,9 +182,8 @@ function amountParameterBox(params, context) {
                     ),
                     status.components.slider(
                         {
-                            maximumValue: 10,
-                            value: 5,
-                            minimumValue: 0,
+                            maximumValue: 2,
+                            minimumValue: -2,
                             onSlidingComplete: status.components.dispatch(
                                 [status.events.UPDATE_DB, "sliderValue"]
                             ),

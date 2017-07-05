@@ -1,7 +1,3 @@
-function round(n) {
-    return Math.round(n * 100) / 100;
-}
-
 function calculateFee(n, tx) {
     var estimatedGas = 21000;
     if (tx !== null) {

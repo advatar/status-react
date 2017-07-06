@@ -366,10 +366,13 @@ function previewSend(params, context) {
         {
             flexDirection: "column",
             alignItems: "flex-end",
+            maxWidth: 250
         },
         [status.components.text(
             {
                 style: amountStyle,
+                numberOfLines: 1,
+                ellipsizeMode: "tail",
                 font: "light"
             },
             status.localizeNumber(params.amount, context.delimiter, context.separator)

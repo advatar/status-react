@@ -139,7 +139,7 @@
             to       (get-in db [:contacts chat-id :address])
             identity (or owner-id bot chat-id)
             bot-db   (get bot-db (or bot chat-id))
-            params   {:parameters (assoc params :bot-db bot-db)
+            params   {:parameters (assoc-in params [:bot-db :public] (:public bot-db))
                       :context    {:from            address
                                    :to              to
                                    :current-account (get accounts current-account-id)

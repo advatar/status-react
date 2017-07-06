@@ -59,13 +59,12 @@
          ^{:key (str "command-" index)}
          [command-view (= index 0) command])])]])
 
-(def prev-command (atom nil))
-
 (defn- basic-text-input [_]
   (let [input-text           (subscribe [:chat :input-text])
         command              (subscribe [:selected-chat-command])
         sending-in-progress? (subscribe [:chat-ui-props :sending-in-progress?])
         input-focused?       (subscribe [:chat-ui-props :input-focused?])
+        prev-command         (subscribe [:chat-ui-props :prev-command])
         input-ref            (atom nil)]
     (fn [{:keys [set-layout-height set-container-width height single-line-input?]}]
       [text-input
@@ -102,9 +101,10 @@
                                           (dispatch [:set-chat-ui-props {:validation-messages nil}]))
                                         (do
                                           (dispatch [:set-chat-input-metadata nil])
-                                          (dispatch [:set-chat-ui-props {:result-box          nil
-                                                                         :validation-messages nil}])))
-                                      (reset! prev-command (-> @command :command :name)))))
+                                          (dispatch [:set-chat-ui-props
+                                                     {:result-box          nil
+                                                      :validation-messages nil
+                                                      :prev-command        (-> @command :command :name)}]))))))
         :on-content-size-change (when (and (not @input-focused?)
                                            (not single-line-input?))
                                   #(let [h (-> (.-nativeEvent %)

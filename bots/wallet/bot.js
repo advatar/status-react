@@ -273,6 +273,7 @@ function validateSend(params, context) {
             )
         };
     }
+
     if (!params["amount"]) {
         return {
             markup: status.components.validationMessage(
@@ -408,7 +409,10 @@ function previewSend(params, context) {
     );
 
     var markup;
-    if (params["bot-db"] && params["bot-db"]["recipient"]) {
+    if (params["bot-db"]
+        && params["bot-db"]["public"]
+        && params["bot-db"]["public"]["recipient"]
+        && params["bot-db"]["public"]["recipient"]["whisper-identity"] !== context["chat"]["chat-id"]) {
         var secondRow = status.components.text(
             {
                 style: {
@@ -417,7 +421,7 @@ function previewSend(params, context) {
                     lineHeight: 18
                 }
             },
-            "to " + params["bot-db"]["recipient"]["name"]
+            "to " + params["bot-db"]["public"]["recipient"]["name"]
         );
         markup = [firstRow, secondRow];
     } else {

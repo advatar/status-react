@@ -41,7 +41,7 @@
   :select-chat-input-command
   (handlers/side-effect!
     (fn [{:keys [current-chat-id chat-ui-props] :as db}
-         [_ {:keys [prefill prefill-bot-db sequential-params] :as command} metadata prevent-auto-focus?]]
+         [_ {:keys [prefill prefill-bot-db sequential-params name] :as command} metadata prevent-auto-focus?]]
       (dispatch [:set-chat-input-text (str (chat-utils/command-name command)
                                            const/spacing-char
                                            (when-not sequential-params
@@ -53,7 +53,8 @@
       (dispatch [:set-chat-input-metadata metadata])
       (dispatch [:set-chat-ui-props {:show-suggestions?   false
                                      :result-box          nil
-                                     :validation-messages nil}])
+                                     :validation-messages nil
+                                     :prev-command        name}])
       (dispatch [:load-chat-parameter-box command 0])
       (if sequential-params
         (js/setTimeout
@@ -264,7 +265,7 @@
                                       :name (i18n/get-contact-translated chat-id :name name)}))
             owner-id        (:owner-id command)
             bot-db          (get bot-db chat-id)
-            params          (assoc (input-model/args->params c) :bot-db (:public bot-db))
+            params          (assoc-in (input-model/args->params c) [:bot-db :public] (:public bot-db))
             command-message {:command    command
                              :params     params
                              :to-message (:to-message-id metadata)

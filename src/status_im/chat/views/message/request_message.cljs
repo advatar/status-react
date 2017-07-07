@@ -77,7 +77,8 @@
         markup              (subscribe [:get-in [:message-data :preview message-id :markup]])]
     (fn [{:keys [message-id content from incoming-group]}]
       (let [commands @commands-atom
-            {:keys [prefill prefillBotDb params]} content
+            {:keys        [prefill prefillBotDb params]
+             text-content :text} content
             {:keys [command content]} (parse-command-request commands content)
             command  (if (and params command)
                        (merge command {:prefill        prefill

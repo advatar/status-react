@@ -13,7 +13,8 @@
   (merge {:platform platform/platform
           :from     current-account-id
           :to       to
-          :chat     {:chat-id chat-id}}
+          :chat     {:chat-id    chat-id
+                     :group-chat (get-in chats [chat-id :group-chat])}}
          i18n/delimeters))
 
 (handlers/register-handler :request-command-data

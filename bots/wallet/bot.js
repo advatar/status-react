@@ -415,7 +415,7 @@ function previewSend(params, context) {
     if (params["bot-db"]
         && params["bot-db"]["public"]
         && params["bot-db"]["public"]["recipient"]
-        && params["bot-db"]["public"]["recipient"]["whisper-identity"] !== context["chat"]["chat-id"]) {
+        && context["chat"]["group-chat"] === true) {
         var secondRow = status.components.text(
             {
                 style: {

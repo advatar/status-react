@@ -265,7 +265,7 @@
                                       :name (i18n/get-contact-translated chat-id :name name)}))
             owner-id        (:owner-id command)
             bot-db          (get bot-db chat-id)
-            params          (assoc-in (input-model/args->params c) [:bot-db :public] (:public bot-db))
+            params          (assoc (input-model/args->params c) :bot-db bot-db)
             command-message {:command    command
                              :params     params
                              :to-message (:to-message-id metadata)

@@ -14,7 +14,8 @@
 (defn text->emoji [text]
   (when text
     (str/replace text
-                 #":([a-z_\-+0-9]*):"
+                 ;; TODO(alwx): I am not sure about this pattern
+                 #":([a-z_\-+0-9\"]*):"
                  (fn [[original emoji-id]]
                    (if-let [emoji-map (aget emojis "lib" emoji-id)]
                      (aget emoji-map "char")

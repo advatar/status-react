@@ -14,8 +14,7 @@
 (defn text->emoji [text]
   (when text
     (str/replace text
-                 ;; TODO(alwx): I am not sure about this pattern
-                 #":([a-z_\-+0-9\"]*):"
+                 #":([a-z_\-+0-9]*):"
                  (fn [[original emoji-id]]
                    (if-let [emoji-map (aget emojis "lib" emoji-id)]
                      (aget emoji-map "char")
@@ -41,13 +40,15 @@
          (vals))))
 
 (defn split-command-args [command-text]
-  (let [space?       (text-ends-with-space? command-text)
-        command-text (if space?
-                       (str command-text ".")
-                       command-text)
-        command-text-normalized (if command-text (str/replace (str/trim command-text) #" +" " ") command-text)
-        splitted     (cond-> (str/split command-text-normalized const/spacing-char)
-                             space? (drop-last))]
+  (let [space?                  (text-ends-with-space? command-text)
+        command-text            (if space?
+                                  (str command-text ".")
+                                  command-text)
+        command-text-normalized (if command-text
+                                  (str/replace (str/trim command-text) #" +" " ")
+                                  command-text)
+        splitted                (cond-> (str/split command-text-normalized const/spacing-char)
+                                        space? (drop-last))]
     (->> splitted
          (reduce (fn [[list command-started?] arg]
                    (let [quotes-count       (count (filter #(= % const/arg-wrapping-char) arg))
@@ -202,4 +203,4 @@
     (str
       command
       const/spacing-char
-      (str/join const/spacing-char new-args))))
+      (join-command-args new-args))))

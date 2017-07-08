@@ -22,15 +22,15 @@
     (fn [{:keys [contacts current-account-id chats] :as db}
          [_ {{:keys [command params content-command type]} :content
              :keys [message-id from chat-id on-requested jail-id] :as message} data-type]]
-      (let [jail-id (or jail-id chat-id)
-            jail-id (if (get-in chats [jail-id :group-chat])
-                      (get-in chats [jail-id :command-suggestions (keyword command) :owner-id])
-                      jail-id)]
-        (if-not (get-in contacts [jail-id :commands-loaded?])
+      (let [jail-id  (or jail-id chat-id)
+            jail-id' (if (get-in chats [jail-id :group-chat])
+                       (get-in chats [jail-id :command-suggestions (keyword command) :owner-id])
+                       jail-id)]
+        (if-not (get-in contacts [jail-id' :commands-loaded?])
           (do (dispatch [:add-commands-loading-callback
-                         jail-id
+                         jail-id'
                          #(dispatch [:request-command-data message data-type])])
-              (dispatch [:load-commands! jail-id]))
+              (dispatch [:load-commands! jail-id']))
           (let [path     [(if (= :response (keyword type)) :responses :commands)
                           (if content-command content-command command)
                           data-type]
@@ -44,7 +44,7 @@
                             (dispatch [:set-in [:message-data data-type message-id] result])
                             (when on-requested (on-requested result)))]
             ;chat-id path params callback lock? type
-            (status/call-jail {:jail-id  jail-id
+            (status/call-jail {:jail-id  jail-id'
                                :path     path
                                :params   params
                                :callback callback})))))))

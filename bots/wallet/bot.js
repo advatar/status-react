@@ -21,15 +21,15 @@ status.defineSubscription(
     }
 );
 
-function getFeeExplaination(n) {
-    return I18n.t('send_explaination') + I18n.t('send_explaination_' + (n + 2));
+function getFeeExplanation(n) {
+    return I18n.t('send_explanation') + I18n.t('send_explanation_' + (n + 2));
 }
 
 status.defineSubscription(
-    "feeExplaination",
+    "feeExplanation",
     {value: ["sliderValue"]},
     function(params) {
-        return getFeeExplaination(params.value);
+        return getFeeExplanation(params.value);
     }
 )
 
@@ -66,7 +66,7 @@ function amountParameterBox(params, context) {
     status.setDefaultDb({
         transaction: txData,
         calculatedFee: calculateFee(sliderValue, txData),
-        feeExplaination: getFeeExplaination(sliderValue),
+        feeExplanation: getFeeExplanation(sliderValue),
         sliderValue: sliderValue
     });
 
@@ -234,7 +234,7 @@ function amountParameterBox(params, context) {
                                 lineHeight: 24
                             }
                         },
-                        [status.components.subscribe(["feeExplaination"])]
+                        [status.components.subscribe(["feeExplanation"])]
                     )
                 ]
             )]

@@ -27,24 +27,21 @@
       [contact-view {:contact  contact
                      :on-press #(select-contact arg-index bot-db-key contact)}])))
 
-(defn choose-contact-view [{arg-index :index}]
-  (let [contacts (subscribe [:contacts-filtered :people-in-current-chat])]
-    (r/create-class
-      {:reagent-render
-       (fn [{title      :title
-             arg-index  :index
-             bot-db-key :bot-db-key}]
-         [view {:flex 1}
-          [text {:style {:font-size      14
-                         :color          "rgb(147, 155, 161)"
-                         :padding-top    12
-                         :padding-left   16
-                         :padding-right  16
-                         :padding-bottom 12}}
-           title]
-          [list-view {:dataSource                (lw/to-datasource @contacts)
-                      :enableEmptySections       true
-                      :renderRow                 (render-row arg-index bot-db-key)
-                      :bounces                   false
-                      :keyboardShouldPersistTaps :always
-                      :renderSeparator           renderers/list-separator-renderer}]])})))
+(defview choose-contact-view [{title      :title
+                               arg-index  :index
+                               bot-db-key :bot-db-key}]
+  [contacts [:contacts-filtered :people-in-current-chat]]
+  [view {:flex 1}
+   [text {:style {:font-size      14
+                  :color          "rgb(147, 155, 161)"
+                  :padding-top    12
+                  :padding-left   16
+                  :padding-right  16
+                  :padding-bottom 12}}
+    title]
+   [list-view {:dataSource                (lw/to-datasource @contacts)
+               :enableEmptySections       true
+               :renderRow                 (render-row arg-index bot-db-key)
+               :bounces                   false
+               :keyboardShouldPersistTaps :always
+               :renderSeparator           renderers/list-separator-renderer}]])
